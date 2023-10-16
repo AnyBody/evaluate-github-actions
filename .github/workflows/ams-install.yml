@@ -34,9 +34,8 @@ jobs:
           cache-environment: true
           environment-name: Python
       
-
       - name: Set Python environment for AnyBody
-        run: echo "ANYBODY_PATH_PYTHONHOME=$HOME/micromamba-root/envs" >> $GITHUB_ENV
+        run: Add-Content -Path $env:GITHUB_ENV -Value "ANYBODY_PATH_PYTHONHOME=$HOME\micromamba-root\envs"
     
       # Runs a single command using the runners shell
       - name: Run a one-line script
