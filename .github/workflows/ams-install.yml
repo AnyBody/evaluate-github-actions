@@ -18,7 +18,6 @@ jobs:
       - name: Create AnyBody Folders
         run: |
           mkdir $HOME/AnyBody
-          mkdir $HOME/Python
           Add-MpPreference -ExclusionPath $HOME/AnyBody
           Add-MpPreference -ExclusionPath $HOME/micromamba-root/envs
 
@@ -27,7 +26,13 @@ jobs:
           environment-file: full-ams-python.conda-lock.yml
           cache-environment: true
           environment-name: Python
-
+      
+      - name: Download and extract AnyBody
+        run: |
+          $url = "https://anybodycloudci.blob.core.windows.net/windows-anybodycon/anybody-minimal-7.5.0-beta6.zip"
+          $output = "$HOME/AnyBody"
+          Add-Type -Assembly System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::ExtractToDirectory($url, $output)         
 
       - name: Set Python environment for AnyBody
         run: echo "ANYBODY_PATH_PYTHONHOME=$HOME/micromamba-root/envs" >> $GITHUB_ENV
@@ -39,7 +44,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
-          cd $HOME/micromamba/envs/Python
+          cd $HOME/AnyBody
           ls
 
           echo Add other actions to build,
