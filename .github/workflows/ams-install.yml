@@ -21,18 +21,19 @@ jobs:
           Add-MpPreference -ExclusionPath $HOME/AnyBody
           Add-MpPreference -ExclusionPath $HOME/micromamba-root/envs
 
+      - name: Download and extract AnyBody
+        run: |
+          $url = "https://anybodycloudci.blob.core.windows.net/windows-anybodycon/anybody-minimal-7.5.0-beta6.zip"
+          Invoke-WebRequest -Uri $url -OutFile "$HOME/AnyBody.zip"
+          Add-Type -Assembly System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::ExtractToDirectory("$HOME/AnyBody.zip", "$HOME/AnyBody")         
+
       - uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: full-ams-python.conda-lock.yml
           cache-environment: true
           environment-name: Python
       
-      - name: Download and extract AnyBody
-        run: |
-          $url = "https://anybodycloudci.blob.core.windows.net/windows-anybodycon/anybody-minimal-7.5.0-beta6.zip"
-          $output = "$HOME/AnyBody"
-          Add-Type -Assembly System.IO.Compression.FileSystem
-          [System.IO.Compression.ZipFile]::ExtractToDirectory($url, $output)         
 
       - name: Set Python environment for AnyBody
         run: echo "ANYBODY_PATH_PYTHONHOME=$HOME/micromamba-root/envs" >> $GITHUB_ENV
