@@ -34,8 +34,9 @@ jobs:
         run: micromamba install -y --name base -c conda-forge pytest-split
   
       - name: Run tests
+        shell: bash
         run: |
-          eval "$(micromamba shell hook --shell=bash)"
+          eval "$(micromamba shell hook --shell=posix)"
           micromamba activate base
 
           cd ammr/Tests
