@@ -34,11 +34,7 @@ jobs:
         run: micromamba install -y --name base -c conda-forge pytest-split
   
       - name: Run tests
-        shell: bash
         run: |
-          eval "$(micromamba shell hook --shell=posix)"
-          micromamba activate base
-
           cd ammr/Tests
           pytest -n auto --dist worksteal --splits 9 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --durations=10 --runslow
 
