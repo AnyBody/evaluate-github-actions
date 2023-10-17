@@ -13,39 +13,20 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Create AnyBody Folders
-        run: |
-          mkdir $HOME/AnyBody
-          Add-MpPreference -ExclusionPath $HOME/AnyBody
-          Add-MpPreference -ExclusionPath $HOME/micromamba-root/envs
-
-      - name: Download and extract AnyBody
-        run: |
-          $url = "https://anybodycloudci.blob.core.windows.net/windows-anybodycon/anybody-minimal-7.5.0-beta6.zip"
-          Invoke-WebRequest -Uri $url -OutFile "$HOME/AnyBody.zip"
-          Add-Type -Assembly System.IO.Compression.FileSystem
-          [System.IO.Compression.ZipFile]::ExtractToDirectory("$HOME/AnyBody.zip", "$HOME/AnyBody")         
-
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          environment-file: full-ams-python.conda-lock.yml
-          cache-environment: true
-          environment-name: Python
-      
-      - name: Set Python environment for AnyBody
-        run: Add-Content -Path $env:GITHUB_ENV -Value "ANYBODY_PATH_PYTHONHOME=$HOME\micromamba-root\envs"
-    
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo $env:ANYBODY_PATH_PYTHONHOME
+          repository: anybody/ammr-spine
+          ref: master-ammr-3.0
+          path: ammr-spine
+          token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          cd $HOME/AnyBody
-          ls
+      # - uses: anybody/setup-anybody@main
+      #   with:
+      #     anybody-version: "7.5.0"
+      #     anybody-version-suffix: "Beta"
+      #     python-environment: "minimal"
 
-          echo Add other actions to build,
-          echo test, and deploy your project.
+
+
+        
