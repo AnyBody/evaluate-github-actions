@@ -9,7 +9,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
+  test:
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
     runs-on: windows-latest
 
     steps:
@@ -21,12 +26,19 @@ jobs:
           path: ammr-spine
           token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
 
-      # - uses: anybody/setup-anybody@main
-      #   with:
-      #     anybody-version: "7.5.0"
-      #     anybody-version-suffix: "Beta"
-      #     python-environment: "minimal"
+      - uses: anybody/setup-anybody@main
+        with:
+          anybody-version: "7.5.0"
+          anybody-version-suffix: "Beta"
+          python-environment: "minimal"
 
+      
+      - name: Install pytest
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: ammr-spine/Tests/test-environment.yml
+          init-shell: powershell
+          cache-environment: true
 
 
         
