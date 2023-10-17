@@ -14,40 +14,16 @@ concurrency:
 
 jobs:
   linux-tests: 
-    strategy:
-      fail-fast: false
-      matrix:
-        test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
     
     runs-on: ubuntu-latest
     container: ghcr.io/anybody/anybodycon-github-actions:latest_Beta
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: anybody/ammr
-          ref: master
-          path: ammr
-          token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
-
-      - name: Install pytest-split
-        run: micromamba install -y --name base -c conda-forge pytest-split
-  
-      - name: Run tests
-        run: |
-          cd ammr/Tests
-          pytest -n auto --dist worksteal --splits 9 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --durations=10 --runslow
-
-
-  windows-tests:
-    strategy:
-      fail-fast: false
-      matrix:
-        test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-    runs-on: windows-latest
-
-    steps:
       - uses: actions/checkout@v4
         with:
           repository: anybody/ammr
@@ -55,26 +31,51 @@ jobs:
           path: ammr
           token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
 
-      - uses: anybody/setup-anybody@main
-        name: Install AnyBody
-        with:
-          anybody-version: "7.5.0"
-          anybody-version-suffix: "Beta"
-          python-environment: "minimal"
-
-      - name: Install pytest
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: ammr/Tests/test-environment.yml
-          init-shell: powershell
-          cache-environment: true
-
-
-      - name:
+      # - name: Install pytest-split
+      #   run: micromamba install -y --name base -c conda-forge pytest-split
+  
+      - name: Run tests
         run: |
           cd ammr/Tests
-          pytest -n auto --dist worksteal --splits 9 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --durations=10 --runslow
+          pytest -n auto --runslow
+
+
+  # windows-tests:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+  #   runs-on: windows-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         repository: anybody/ammr
+  #         ref: master
+  #         path: ammr
+  #         token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
+
+  #     - uses: anybody/setup-anybody@main
+  #       name: Install AnyBody
+  #       with:
+  #         anybody-version: "7.5.0"
+  #         anybody-version-suffix: "Beta"
+  #         python-environment: "minimal"
+
+  #     - name: Install pytest
+  #       uses: mamba-org/setup-micromamba@v1
+  #       with:
+  #         environment-file: ammr/Tests/test-environment.yml
+  #         init-shell: powershell
+  #         cache-environment: true
+
+
+  #     - name:
+  #       run: |
+  #         cd ammr/Tests
+  #         pytest -n auto --dist worksteal --splits 9 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --durations=10 --runslow
         
-        env:
-          RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
-          RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
+  #       env:
+  #         RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
+  #         RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
