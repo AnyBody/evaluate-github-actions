@@ -5,8 +5,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
   workflow_dispatch:
+
 
 jobs:
   test:
@@ -45,3 +45,6 @@ jobs:
         run: | 
           cd ammr/Tests
           pytest -n auto --dist worksteal --splits 16 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow
+        env:
+          RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
+          RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
