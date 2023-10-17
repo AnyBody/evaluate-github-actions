@@ -1,4 +1,4 @@
-name: CI
+name: Test AMMR
 
 on:
   push:
@@ -9,7 +9,32 @@ on:
 
 
 jobs:
-  test:
+  linux-tests: 
+    strategy:
+      fail-fast: false
+      matrix:
+        test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    runs-on: ghcr.io/anybody/anybodycon-github-actions:latest_Beta
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: anybody/ammr
+          ref: master
+          path: ammr
+          token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
+
+      - name: Install pytest-split
+        run: micromamba install -y pytest-split
+  
+      - name: Run tests
+        run: | 
+          cd ammr/Tests
+          pytest -n auto --dist worksteal --splits 9 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --durations=10 --runslow
+
+
+  windows-tests:
     strategy:
       fail-fast: false
       matrix:
@@ -18,7 +43,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           repository: anybody/ammr
