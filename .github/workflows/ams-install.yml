@@ -35,7 +35,7 @@ jobs:
   
       - name: Run tests
         run: |
-          eval "$(micromamba shell hook --shell=)"
+          eval "$(micromamba shell hook --shell=bash)"
           micromamba activate base
 
           cd ammr/Tests
