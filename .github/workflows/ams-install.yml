@@ -21,9 +21,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
-          repository: anybody/ammr-spine
-          ref: master-ammr-3.0
-          path: ammr-spine
+          repository: anybody/ammr
+          ref: master
+          path: ammr
           token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
 
       - uses: anybody/setup-anybody@main
@@ -36,7 +36,7 @@ jobs:
       - name: Install pytest
         uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: ammr-spine/Tests/test-environment.yml
+          environment-file: ammr/Tests/test-environment.yml
           init-shell: powershell
           cache-environment: true
 
