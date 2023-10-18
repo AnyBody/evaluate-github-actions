@@ -1,0 +1,42 @@
+name: Upload .test-durations file
+
+on:
+  workflow_dispatch:
+
+concurrency: 
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+  store-durations: 
+    
+    runs-on: ubuntu-latest
+    container: ghcr.io/anybody/anybodycon-github-actions:latest_Beta
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: anybody/ammr
+          ref: master
+          path: ammr
+          token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
+
+      - name: Install pytest-split
+        run: micromamba install -y --name base -c conda-forge pytest-split=0.8.1
+  
+      - name: Run tests
+        run: |
+          cd ammr/Tests
+          pytest --store-durations --runslow
+        env:
+          RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
+          RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
+
+      # Store the artifact ammr/Tests/.test_durations file to github actifacts
+      - name: Upload test durations
+        uses: actions/upload-artifact@v2
+        with:
+          name: test_durations
+          path: ammr/Tests/.test_durations
+
