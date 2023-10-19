@@ -66,6 +66,7 @@ jobs:
           out = {}
           for file in files:
               out.update(json.loads(file.read_text()))
+          out = {k: v for k, v in sorted(out.items(), key=lambda item: item[1], reverse=True)}
           pathlib.Path('.test_durations').write_text(json.dumps(out, indent=2))    
         shell: python
 
