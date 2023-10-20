@@ -13,76 +13,50 @@ concurrency:
 
 
 jobs:
-  linux-tests: 
-    strategy:
-      fail-fast: false
-      matrix:
-        test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  # linux-tests: 
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     
-    runs-on: ubuntu-latest
-    container: ghcr.io/anybody/anybodycon-github-actions:latest_Beta
+  #   runs-on: ubuntu-latest
+  #   container: ghcr.io/anybody/anybodycon-github-actions:latest_Beta
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          repository: anybody/ammr
-          ref: master
-          path: ammr
-          token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         repository: anybody/ammr
+  #         ref: master
+  #         path: ammr
+  #         token: ${{ secrets.AMMR_SPINE_READ_TOKEN }}
 
-      - name: Install pytest-split
-        run: micromamba install -y --name base -c conda-forge pytest-split=0.8.1
+  #     - name: Install pytest-split
+  #       run: micromamba install -y --name base -c conda-forge pytest-split=0.8.1
   
-      - name: Run tests
-        run: |
-          cd ammr/Tests
-          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow  --junitxml=output-linux.xml --store-durations --clean-durations
-        env:
-          RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
-          RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
+  #     - name: Run tests
+  #       run: |
+  #         cd ammr/Tests
+  #         pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow  --junitxml=output-linux.xml --store-durations --clean-durations
+  #       env:
+  #         RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
+  #         RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
          
-      - name: Upload partial durations
-        uses: actions/upload-artifact@v3
-        with:
-          name: split-linux-${{ matrix.test_group }}
-          path: | 
-            ammr/Tests/.test_durations
-            ammr/Tests/output-linux.xml
-          retention-days: 1
+  #     - name: Upload partial durations
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: split-linux-${{ matrix.test_group }}
+  #         path: | 
+  #           ammr/Tests/.test_durations
+  #           ammr/Tests/output-linux.xml
+  #         retention-days: 1
 
-
-  upload-timings:
-    runs-on: ubuntu-latest
-    needs: linux-tests
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-
-      - name: Combine test-durations
-        run: |
-          import json, pathlib
-          files = pathlib.Path.cwd().glob("split-linux-*/.test_durations")
-          out = {}
-          for file in files:
-              out.update(json.loads(file.read_text()))
-          out = {k: v for k, v in sorted(out.items(), key=lambda item: item[1], reverse=True)}
-          pathlib.Path('.test_durations').write_text(json.dumps(out, indent=2))    
-        shell: python
-
-      - name: Upload full durations file
-        uses: actions/upload-artifact@v3
-        with:
-          name: .test_durations
-          path: .test_durations
 
 
   windows-tests:
     strategy:
       fail-fast: false
       matrix:
-        test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+        test_group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20]
 
     runs-on: windows-latest
 
@@ -99,9 +73,9 @@ jobs:
         with:
           anybody-version: "7.5.0"
           anybody-version-suffix: "Beta"
-          python-environment: "minimal"
+          python-environment: "none"
 
-      - name: Install pytest
+      - name: Install test libraries
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: ammr/Tests/test-environment.yml
@@ -111,8 +85,10 @@ jobs:
       - name:
         run: |
           cd ammr/Tests
-          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow --junitxml=output-windows.xml --store-durations --clean-durations
-        
+          pytest --runslow `
+             --splits 20 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration `
+             --junitxml=output-windows.xml `
+             --store-durations --clean-durations
         env:
           RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
           RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
@@ -120,8 +96,37 @@ jobs:
       - name: Upload partial durations
         uses: actions/upload-artifact@v3
         with:
-          name: split-win-${{ matrix.test_group }}
+          name: split-${{ matrix.test_group }}
           path: | 
             ammr/Tests/.test_durations
             ammr/Tests/output-windows.xml
           retention-days: 1
+
+
+  upload-timings:
+    runs-on: ubuntu-latest
+    needs: windows-tests
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Combine test-durations
+        run: |
+          import json, pathlib
+          files = pathlib.Path.cwd().glob("split-*/.test_durations")
+          out = {}
+          for file in files:
+              out.update(json.loads(file.read_text()))
+          out = {k: v for k, v in sorted(out.items(), key=lambda item: item[1], reverse=True)}
+          pathlib.Path('.test_durations').write_text(json.dumps(out, indent=2))    
+        shell: python
+
+      - name: Upload full durations file
+        uses: actions/upload-artifact@v3
+        with:
+          name: .test_durations
+          path: .test_durations
+          retention-days: 3
