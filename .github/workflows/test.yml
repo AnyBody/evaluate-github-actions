@@ -36,7 +36,7 @@ jobs:
       - name: Run tests
         run: |
           cd ammr/Tests
-          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow --clean-durations --durations=5 --store-durations
+          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow  --junitxml=output-linux.xml --store-durations --clean-durations
         env:
           RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
           RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
@@ -44,10 +44,11 @@ jobs:
       - name: Upload partial durations
         uses: actions/upload-artifact@v3
         with:
-          name: split-${{ matrix.test_group }}
-          path: ammr/Tests/.test_durations
+          name: split-linux-${{ matrix.test_group }}
+          path: | 
+            ammr/Tests/.test_durations
+            ammr/Tests/output-linux.xml
           retention-days: 1
-
 
 
   upload-timings:
@@ -62,7 +63,7 @@ jobs:
       - name: Combine test-durations
         run: |
           import json, pathlib
-          files = pathlib.Path.cwd().glob("*/.test_durations")
+          files = pathlib.Path.cwd().glob("split-linux-*/.test_durations")
           out = {}
           for file in files:
               out.update(json.loads(file.read_text()))
@@ -110,8 +111,17 @@ jobs:
       - name:
         run: |
           cd ammr/Tests
-          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --durations=5 --runslow
+          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow --junitxml=output-windows.xml --store-durations --clean-durations
         
         env:
           RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
           RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
+
+      - name: Upload partial durations
+        uses: actions/upload-artifact@v3
+        with:
+          name: split-win-${{ matrix.test_group }}
+          path: | 
+            ammr/Tests/.test_durations
+            ammr/Tests/output-windows.xml
+          retention-days: 1
