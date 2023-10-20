@@ -52,7 +52,7 @@ jobs:
 
 
 
-  windows-tests:
+  ammr-test:
     strategy:
       fail-fast: false
       matrix:
