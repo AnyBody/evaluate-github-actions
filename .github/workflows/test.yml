@@ -23,7 +23,7 @@ jobs:
     container: ghcr.io/anybody/anybodycon-github-actions:latest_Beta
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           repository: anybody/ammr
           ref: split-slow-tests
@@ -36,7 +36,7 @@ jobs:
       - name: Run tests
         run: |
           cd ammr/Tests
-          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow --clean-durations --durations --store-durations
+          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --runslow --clean-durations --durations=5 --store-durations
         env:
           RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
           RLM_LICENSE_PASSWORD: ${{ secrets.RLM_LICENSE_PASSWORD }}
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: linux-tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
@@ -86,7 +86,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           repository: anybody/ammr
           ref: master
@@ -110,7 +110,7 @@ jobs:
       - name:
         run: |
           cd ammr/Tests
-          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --durations --runslow
+          pytest --splits 10 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration --durations=5 --runslow
         
         env:
           RLM_LICENSE: ${{ secrets.RLM_LICENSE }}
