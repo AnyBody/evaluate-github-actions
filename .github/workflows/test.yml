@@ -86,6 +86,7 @@ jobs:
         run: |
           cd ammr/Tests
           pytest --runslow `
+             -n auto --dist worksteal `
              --splits 20 --group ${{ matrix.test_group }} --splitting-algorithm=least_duration `
              --junitxml=output-windows.xml `
              --store-durations --clean-durations
@@ -105,7 +106,7 @@ jobs:
 
   upload-timings:
     runs-on: ubuntu-latest
-    needs: windows-tests
+    needs: ammr-test
 
     steps:
       - name: Download artifacts
