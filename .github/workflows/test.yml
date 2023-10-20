@@ -73,7 +73,7 @@ jobs:
         with:
           anybody-version: "7.5.0"
           anybody-version-suffix: "Beta"
-          python-environment: "none"
+          python-environment: "minimal"
 
       - name: Install test libraries
         uses: mamba-org/setup-micromamba@v1
