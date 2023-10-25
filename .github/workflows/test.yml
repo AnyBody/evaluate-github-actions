@@ -73,6 +73,7 @@ jobs:
         with:
           anybody-version: "7.5.0"
           anybody-version-suffix: "Beta"
+          anybody-version-build: "7"
           python-environment: "minimal"
 
       - name: Install test libraries
